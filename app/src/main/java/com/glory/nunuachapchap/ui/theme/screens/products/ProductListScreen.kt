@@ -50,40 +50,69 @@ import java.io.IOException
 fun ProductListScreen(navController: NavController, viewModel: ProductViewModel) {
     val productList by viewModel.allProducts.observeAsState(emptyList())
     var showMenu by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredProducts = productList.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Products", fontSize = 20.sp) },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
-                actions = {
+            Column {
+                TopAppBar(
+                    title = { Text("Products", fontSize = 20.sp) },
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
+                    actions = {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Product List") },
+                                onClick = {
+                                    navController.navigate(ROUT_PRODUCT_LIST)
+                                    showMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Add Product") },
+                                onClick = {
+                                    navController.navigate(ROUT_ADD_PRODUCT)
+                                    showMenu = false
+                                }
+                            )
+                        }
+                    }
+                )
 
-                    //Menu with navigation
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Product List") },
-                            onClick = {
-                                navController.navigate(ROUT_PRODUCT_LIST)
-                                showMenu = false
-                            }
+
+                //Search Bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    placeholder = { Text("Search products...") },
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = Color.Gray
                         )
-                        DropdownMenuItem(
-                            text = { Text("Add Product") },
-                            onClick = {
-                                navController.navigate(ROUT_ADD_PRODUCT)
-                                showMenu = false
-                            }
-                        )
-                    }
-                    //End of menu with navigation
-                }
-            )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,  // Border color when focused
+                        unfocusedBorderColor = Color.Gray, // Border color when not focused
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray
+                    )
+                )
+            }
         },
         bottomBar = { BottomNavigationBar1(navController) }
     ) { paddingValues ->
@@ -94,19 +123,13 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                 .padding(16.dp)
         ) {
             LazyColumn {
-                items(productList.size) { index ->
-                    ProductItem(navController, productList[index], viewModel)
+                items(filteredProducts.size) { index ->
+                    ProductItem(navController, filteredProducts[index], viewModel)
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
         }
     }
 }
-
-
 
 @Composable
 fun ProductItem(navController: NavController, product: Product, viewModel: ProductViewModel) {
