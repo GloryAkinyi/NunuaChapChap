@@ -1,28 +1,42 @@
 package com.glory.nunuachapchap.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.glory.nunuachapchap.data.ProductDatabase
 import com.glory.nunuachapchap.model.Product
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class ProductViewModel : ViewModel() {
-    private val _allProducts = MutableLiveData<List<Product>>(emptyList())
-    val allProducts: LiveData<List<Product>> = _allProducts
+class ProductViewModel(app: Application) : AndroidViewModel(app) {
 
-    fun addProduct(name: String, price: Double,phone:String, imageUri: String) {
-        val newList = _allProducts.value.orEmpty().toMutableList()
-        newList.add(Product(id = newList.size + 1, name = name, price = price,phone = phone, imagePath = imageUri))
-        _allProducts.value = newList
+    private val productDao = ProductDatabase.getDatabase(app).productDao()
+
+    // This LiveData is directly tied to the Room database
+    val allProducts: LiveData<List<Product>> = productDao.getAllProducts()
+
+    fun addProduct(name: String, price: Double, phone: String, imageUri: String) {
+        val newProduct = Product(
+            name = name,
+            price = price,
+            phone = phone,
+            imagePath = imageUri
+        )
+        viewModelScope.launch(Dispatchers.IO) {
+            productDao.insertProduct(newProduct)
+        }
     }
 
     fun updateProduct(updatedProduct: Product) {
-        val newList = _allProducts.value?.map { if (it.id == updatedProduct.id) updatedProduct else it }
-        _allProducts.value = newList
+        viewModelScope.launch(Dispatchers.IO) {
+            productDao.updateProduct(updatedProduct)
+        }
     }
 
     fun deleteProduct(product: Product) {
-        val newList = _allProducts.value.orEmpty().toMutableList()
-        newList.removeIf { it.id == product.id }
-        _allProducts.value = newList
+        viewModelScope.launch(Dispatchers.IO) {
+            productDao.deleteProduct(product)
+        }
     }
 }

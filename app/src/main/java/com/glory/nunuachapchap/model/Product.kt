@@ -10,5 +10,5 @@ data class Product(
     val name: String,
     val price: Double,
     val phone: String,
-    val imagePath: String  // Path of the stored image
+    val imagePath: String
 )

@@ -28,7 +28,7 @@ import com.glory.nunuachapchap.viewmodel.ProductViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_LOGIN,
+    startDestination: String = ROUT_PRODUCT_LIST,
     productViewModel: ProductViewModel = viewModel(),
 
     ) {

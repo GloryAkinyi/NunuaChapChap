@@ -1,14 +1,18 @@
 package com.glory.nunuachapchap.ui.theme.screens.products
 
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,7 +48,9 @@ import com.glory.nunuachapchap.navigation.editProductRoute
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListScreen(navController: NavController, viewModel: ProductViewModel) {
@@ -131,6 +137,7 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun ProductItem(navController: NavController, product: Product, viewModel: ProductViewModel) {
     val painter: Painter = rememberAsyncImagePainter(
@@ -263,16 +270,14 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
     }
 }
 
-
-
+@RequiresApi(Build.VERSION_CODES.Q)
 fun generateProductPDF(context: Context, product: Product) {
     val pdfDocument = PdfDocument()
-    val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()  // Increased height for image
+    val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()
     val page = pdfDocument.startPage(pageInfo)
     val canvas = page.canvas
     val paint = android.graphics.Paint()
 
-    // Load image from URI if available
     val bitmap: Bitmap? = try {
         product.imagePath?.let {
             val uri = Uri.parse(it)
@@ -285,16 +290,14 @@ fun generateProductPDF(context: Context, product: Product) {
         null
     }
 
-    // Draw Image if available
     bitmap?.let {
         val scaledBitmap = Bitmap.createScaledBitmap(it, 250, 150, false)
-        canvas.drawBitmap(scaledBitmap, 25f, 20f, paint)  // Adjusted position
+        canvas.drawBitmap(scaledBitmap, 25f, 20f, paint)
     }
 
-    // Draw Text
     paint.textSize = 16f
     paint.isFakeBoldText = true
-    canvas.drawText("Product Details", 80f, 200f, paint)  // Moved down
+    canvas.drawText("Product Details", 80f, 200f, paint)
 
     paint.textSize = 12f
     paint.isFakeBoldText = false
@@ -304,21 +307,34 @@ fun generateProductPDF(context: Context, product: Product) {
 
     pdfDocument.finishPage(page)
 
-    // Save PDF
-    val downloadsPath =
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val file = File(downloadsPath, "${product.name}_Details.pdf")
-
-    try {
-        val fos = FileOutputStream(file)
-        pdfDocument.writeTo(fos)
-        pdfDocument.close()
-        fos.close()
-        Toast.makeText(context, "PDF saved in Downloads!", Toast.LENGTH_LONG).show()
-    } catch (e: IOException) {
-        e.printStackTrace()
-        Toast.makeText(context, "Failed to save PDF!", Toast.LENGTH_LONG).show()
+    // Save PDF using MediaStore (Scoped Storage)
+    val fileName = "${product.name}_Details.pdf"
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
     }
+
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (uri != null) {
+        try {
+            val outputStream: OutputStream? = contentResolver.openOutputStream(uri)
+            if (outputStream != null) {
+                pdfDocument.writeTo(outputStream)
+                Toast.makeText(context, "PDF saved to Downloads!", Toast.LENGTH_LONG).show()
+            }
+            outputStream?.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "Failed to save PDF!", Toast.LENGTH_LONG).show()
+        }
+    } else {
+        Toast.makeText(context, "Failed to create file!", Toast.LENGTH_LONG).show()
+    }
+
+    pdfDocument.close()
 }
 
 // Bottom Navigation Bar Component
