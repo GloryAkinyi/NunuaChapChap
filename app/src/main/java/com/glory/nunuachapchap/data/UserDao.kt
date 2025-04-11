@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.glory.nunuachapchap.model.User
 
+
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

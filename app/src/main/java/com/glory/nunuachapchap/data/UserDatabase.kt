@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.glory.nunuachapchap.model.User
 
-@Database(entities = [User::class], version = 1, exportSchema = false)
+@Database(entities = [User::class], version = 2, exportSchema = false)
 abstract class UserDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
@@ -20,7 +20,9 @@ abstract class UserDatabase : RoomDatabase() {
                     context.applicationContext,
                     UserDatabase::class.java,
                     "user_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // DANGEROUS IN PRODUCTION, OK FOR NOW
+                    .build()
                 INSTANCE = instance
                 instance
             }

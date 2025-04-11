@@ -32,6 +32,7 @@ import com.glory.nunuachapchap.model.User
 import com.glory.nunuachapchap.navigation.ROUT_LOGIN
 import com.glory.nunuachapchap.viewmodel.AuthViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     authViewModel: AuthViewModel,
@@ -75,6 +76,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Username
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
@@ -82,9 +84,13 @@ fun RegisterScreen(
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Username Icon") },
             modifier = Modifier.fillMaxWidth()
         )
+        //End of username
+
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        //Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -93,8 +99,49 @@ fun RegisterScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
+        //End of email
 
         Spacer(modifier = Modifier.height(8.dp))
+
+
+        //Role
+        var role by remember { mutableStateOf("user") }
+        val roleOptions = listOf("user", "admin")
+        var expanded by remember { mutableStateOf(false) }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = role,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Select Role") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                roleOptions.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption) },
+                        onClick = {
+                            role = selectionOption
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+            //End of role
+
+
+
+
+
 
         // Password Input Field with Show/Hide Toggle
         OutlinedTextField(
@@ -153,7 +200,7 @@ fun RegisterScreen(
                     } else if (password != confirmPassword) {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                     } else {
-                        authViewModel.registerUser(User(username = username, email = email, password = password))
+                        authViewModel.registerUser(User(username = username, email = email, role = role, password = password))
                         onRegisterSuccess()
                     }
                 },

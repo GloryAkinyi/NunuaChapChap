@@ -7,7 +7,7 @@ import com.glory.nunuachapchap.repository.UserRepository
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val repository: UserRepository) : ViewModel() {
-    var loginSuccess: ((Boolean) -> Unit)? = null
+    var loggedInUser: ((User?) -> Unit)? = null
 
     fun registerUser(user: User) {
         viewModelScope.launch {
@@ -18,7 +18,7 @@ class AuthViewModel(private val repository: UserRepository) : ViewModel() {
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             val user = repository.loginUser(email, password)
-            loginSuccess?.invoke(user != null)
+            loggedInUser?.invoke(user)
         }
     }
 }
