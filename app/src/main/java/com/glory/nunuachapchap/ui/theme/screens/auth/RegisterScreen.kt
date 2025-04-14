@@ -67,12 +67,6 @@ fun RegisterScreen(
                 fontFamily = FontFamily.Cursive
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Image(
-            painter = painterResource(id = R.drawable.register),
-            contentDescription = "Register Icon",
-            modifier = Modifier.size(200.dp)
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

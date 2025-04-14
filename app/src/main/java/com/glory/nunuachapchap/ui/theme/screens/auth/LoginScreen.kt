@@ -80,15 +80,6 @@ fun LoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Centered Icon
-        Image(
-            painter = painterResource(id = R.drawable.login), // Ensure the 'login' image exists in drawable
-            contentDescription = "Login Icon",
-             modifier = Modifier.size(120.dp)
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
         // Email Input

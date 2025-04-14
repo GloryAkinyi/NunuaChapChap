@@ -3,9 +3,10 @@ package com.glory.nunuachapchap.navigation
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -14,35 +15,39 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.glory.nunuachapchap.data.ContentDatabase
 import com.glory.nunuachapchap.data.UserDatabase
+import com.glory.nunuachapchap.repository.ContentRepository
 import com.glory.nunuachapchap.repository.UserRepository
 import com.glory.nunuachapchap.ui.theme.screens.about.AboutScreen
 import com.glory.nunuachapchap.ui.theme.screens.auth.LoginScreen
 import com.glory.nunuachapchap.ui.theme.screens.auth.RegisterScreen
+import com.glory.nunuachapchap.ui.theme.screens.content.UploadContentScreen
+import com.glory.nunuachapchap.ui.theme.screens.content.ViewContentScreen
 import com.glory.nunuachapchap.ui.theme.screens.home.HomeScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.AddProductScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.EditProductScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.ProductListScreen
 import com.glory.nunuachapchap.viewmodel.AuthViewModel
+import com.glory.nunuachapchap.viewmodel.ContentViewModel
 import com.glory.nunuachapchap.viewmodel.ProductViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.Q)
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_LOGIN,
+    startDestination: String = ROUT_VIEW_CONTENT,
     productViewModel: ProductViewModel = viewModel(),
 ) {
 
+
+
+
+
     val context = LocalContext.current
-
-
-    // Initialize Room Database and Repository for Authentication
-    val appDatabase = UserDatabase.getDatabase(context)
-    val authRepository = UserRepository(appDatabase.userDao())
-    val authViewModel: AuthViewModel = AuthViewModel(authRepository)
 
     NavHost(
         navController = navController,
@@ -57,6 +62,13 @@ fun AppNavHost(
             AboutScreen(navController)
         }
 
+
+        //AUTHENTICATION
+
+        // Initialize Room Database and Repository for Authentication
+        val appDatabase = UserDatabase.getDatabase(context)
+        val authRepository = UserRepository(appDatabase.userDao())
+        val authViewModel: AuthViewModel = AuthViewModel(authRepository)
         composable(ROUT_REGISTER) {
             RegisterScreen(authViewModel, navController) {
                 navController.navigate(ROUT_LOGIN) {
@@ -73,7 +85,14 @@ fun AppNavHost(
             }
         }
 
-        // Products
+
+
+
+
+
+
+
+        // PRODUCTS
         composable(ROUT_ADD_PRODUCT) {
             AddProductScreen(navController, productViewModel)
         }
@@ -91,6 +110,27 @@ fun AppNavHost(
                 EditProductScreen(productId, navController, productViewModel)
             }
         }
+
+
+
+
+
+        //CONTENT
+
+        // Initialize Content Database and ViewModel
+        val contentDatabase = ContentDatabase.getDatabase(context)
+        val contentRepository = ContentRepository(contentDatabase.contentDao())
+        val contentViewModel = ContentViewModel(contentRepository)
+
+        composable(ROUT_UPLOAD_CONTENT) {
+            UploadContentScreen(navController, contentViewModel)
+        }
+        composable(ROUT_VIEW_CONTENT) {
+            ViewContentScreen(navController, contentViewModel) { id ->
+                navController.navigate("upload_content?id=$id")
+            }
+        }
+
 
 
     }
