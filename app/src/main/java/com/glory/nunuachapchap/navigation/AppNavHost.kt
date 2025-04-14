@@ -15,9 +15,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.glory.nunuachapchap.ui.theme.screens.task.UploadTaskScreen
 import com.glory.nunuachapchap.data.ContentDatabase
+import com.glory.nunuachapchap.data.TaskDatabase
 import com.glory.nunuachapchap.data.UserDatabase
 import com.glory.nunuachapchap.repository.ContentRepository
+import com.glory.nunuachapchap.repository.TaskRepository
 import com.glory.nunuachapchap.repository.UserRepository
 import com.glory.nunuachapchap.ui.theme.screens.about.AboutScreen
 import com.glory.nunuachapchap.ui.theme.screens.auth.LoginScreen
@@ -28,9 +31,11 @@ import com.glory.nunuachapchap.ui.theme.screens.home.HomeScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.AddProductScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.EditProductScreen
 import com.glory.nunuachapchap.ui.theme.screens.products.ProductListScreen
+import com.glory.nunuachapchap.ui.theme.screens.task.ViewTaskScreen
 import com.glory.nunuachapchap.viewmodel.AuthViewModel
 import com.glory.nunuachapchap.viewmodel.ContentViewModel
 import com.glory.nunuachapchap.viewmodel.ProductViewModel
+import com.glory.nunuachapchap.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -39,7 +44,7 @@ import com.glory.nunuachapchap.viewmodel.ProductViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_VIEW_CONTENT,
+    startDestination: String = ROUT_VIEW_TASK,
     productViewModel: ProductViewModel = viewModel(),
 ) {
 
@@ -128,6 +133,22 @@ fun AppNavHost(
         composable(ROUT_VIEW_CONTENT) {
             ViewContentScreen(navController, contentViewModel) { id ->
                 navController.navigate("upload_content?id=$id")
+            }
+        }
+
+        //TASK
+
+        // Initialize Content Database and ViewModel
+        val taskDatabase = TaskDatabase.getDatabase(context)
+        val taskRepository = TaskRepository(taskDatabase.taskDao())
+        val taskViewModel = TaskViewModel(taskRepository)
+
+        composable(ROUT_UPLOAD_TASK) {
+            UploadTaskScreen(navController, taskViewModel)
+        }
+        composable(ROUT_VIEW_TASK) {
+            ViewTaskScreen(navController, taskViewModel) { id ->
+                navController.navigate("upload_task?id=$id")
             }
         }
 

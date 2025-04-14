@@ -26,4 +26,8 @@ const val ROUT_UPLOAD_CONTENT = "upload_content"
 const val ROUT_VIEW_CONTENT = "view_content"
 
 
+//Task
+const val ROUT_UPLOAD_TASK = "upload_task"
+const val ROUT_VIEW_TASK = "view_task"
+
 
