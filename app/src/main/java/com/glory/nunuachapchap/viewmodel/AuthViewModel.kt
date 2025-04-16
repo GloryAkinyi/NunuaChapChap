@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel(private val repository: UserRepository) : ViewModel() {
     var loggedInUser: ((User?) -> Unit)? = null
 
-    fun registerUser(user: User) {
+    open fun registerUser(user: User) {
         viewModelScope.launch {
             repository.registerUser(user)
         }

@@ -1,5 +1,6 @@
 package com.glory.nunuachapchap.ui.theme.screens.auth
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -24,9 +25,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.glory.nunuachapchap.R
 import com.glory.nunuachapchap.model.User
 import com.glory.nunuachapchap.navigation.ROUT_LOGIN
@@ -59,6 +62,8 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+
         Spacer(modifier = Modifier.height(8.dp))
         AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
             Text(
@@ -214,3 +219,5 @@ fun RegisterScreen(
         }
     }
 }
+
+
