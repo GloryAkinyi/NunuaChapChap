@@ -44,7 +44,7 @@ import com.glory.nunuachapchap.viewmodel.TaskViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_ADD_PRODUCT,
+    startDestination: String = ROUT_UPLOAD_TASK,
     productViewModel: ProductViewModel = viewModel(),
 ) {
 

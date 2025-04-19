@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.glory.nunuachapchap.model.Task
+import com.glory.nunuachapchap.navigation.ROUT_VIEW_TASK
 import com.glory.nunuachapchap.viewmodel.TaskViewModel
 import java.util.Calendar
 
@@ -283,7 +284,7 @@ fun UploadTaskScreen(
                         } else {
                             taskViewModel.insert(task)
                         }
-                        navController.popBackStack()
+                        navController.navigate(ROUT_VIEW_TASK)
                     },
                         shape = RoundedCornerShape(10.dp)
                     ) {
